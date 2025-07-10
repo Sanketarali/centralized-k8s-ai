@@ -21,7 +21,7 @@ spec:
           - -c
           - |
             apt update && apt install -y git && \
-            git clone https://github.com/rdwr-sanketa/centralized-k8s-ai.git /app && \
+            git clone https://github.com/sanketarali/centralized-k8s-ai.git /app && \
             cd /app/app && \
             pip install --no-cache-dir -r requirements.txt && \
             uvicorn main:app --host 0.0.0.0 --port 8000
