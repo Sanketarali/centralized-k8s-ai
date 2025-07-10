@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-ai-query
+  namespace: mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-ai-query
+  template:
+    metadata:
+      labels:
+        app: k8s-ai-query
+    spec:
+      containers:
+      - name: k8s-ai-query
+        image: python:3.10-slim
+        command:
+          - /bin/sh
+          - -c
+          - |
+            apt update && apt install -y git && \
+            git clone https://github.com/rdwr-sanketa/centralized-k8s-ai.git /app && \
+            cd /app/app && \
+            pip install --no-cache-dir -r requirements.txt && \
+            uvicorn main:app --host 0.0.0.0 --port 8000
+        env:
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-secret
+              key: api_key
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-ai-query-service
+  namespace: mcp
+spec:
+  selector:
+    app: k8s-ai-query
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: NodePort
