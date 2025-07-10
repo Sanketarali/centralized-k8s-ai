@@ -1,27 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Kubernetes AI Query</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>K8s AI Chat</title>
+    <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <h1>Kubernetes AI Query Platform</h1>
-    <input type="text" id="prompt" placeholder="Enter your prompt">
-    <button onclick="sendPrompt()">Submit</button>
-    <pre id="result"></pre>
+    <div class="chat-container">
+        <div id="chat-log" class="chat-log"></div>
+        <div class="input-container">
+            <input type="text" id="prompt-input" placeholder="Type your prompt here..." />
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
 
     <script>
-        function sendPrompt() {
-            const prompt = document.getElementById("prompt").value;
-            fetch("/prompt", {
+        const sendBtn = document.getElementById("send-btn");
+        const promptInput = document.getElementById("prompt-input");
+        const chatLog = document.getElementById("chat-log");
+
+        sendBtn.addEventListener("click", async () => {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+            // Add user prompt to chat log
+            chatLog.innerHTML += `<div class="user-msg">${prompt}</div>`;
+            promptInput.value = "";
+
+            // Add loading indicator
+            chatLog.innerHTML += `<div class="bot-msg">...</div>`;
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            const response = await fetch("/prompt", {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({prompt})
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt }),
             });
-        }
+
+            const data = await response.json();
+            const botMsg = data.ai_reply || "Error processing prompt.";
+
+            // Replace loading indicator with actual reply
+            const botMsgDivs = document.getElementsByClassName("bot-msg");
+            botMsgDivs[botMsgDivs.length - 1].innerHTML = botMsg;
+            chatLog.scrollTop = chatLog.scrollHeight;
+        });
     </script>
 </body>
 </html>
