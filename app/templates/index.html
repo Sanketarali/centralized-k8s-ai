@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kubernetes AI Query</title>
+</head>
+<body>
+    <h1>Kubernetes AI Query Platform</h1>
+    <input type="text" id="prompt" placeholder="Enter your prompt">
+    <button onclick="sendPrompt()">Submit</button>
+    <pre id="result"></pre>
+
+    <script>
+        function sendPrompt() {
+            const prompt = document.getElementById("prompt").value;
+            fetch("/prompt", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({prompt})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+            });
+        }
+    </script>
+</body>
+</html>
