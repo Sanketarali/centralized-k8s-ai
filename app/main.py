@@ -1,13 +1,11 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from kubernetes import client, config
 from openai import OpenAI
 import os
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Load kube config (in-cluster for pod, local for testing)
