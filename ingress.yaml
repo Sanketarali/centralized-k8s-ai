@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: centralized-k8s-ai-ingress
+  namespace: mcp
+spec:
+  rules:
+  - host: centralized-ai.corp.company.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: centralized-k8s-ai-service
+            port:
+              number: 80
