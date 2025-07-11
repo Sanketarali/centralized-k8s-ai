@@ -30,8 +30,11 @@ spec:
         ports:
         - containerPort: 8000
         env:
-        - name: OPENAI_API_KEY
-          value: "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"
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: centralized-k8s-ai-secrets
+              key: GEMINI_API_KEY
         - name: GRAFANA_URL
           value: "http://observ-stg.cloud-ng.net"
         - name: GRAFANA_API_KEY
