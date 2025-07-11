@@ -1,49 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-ai-query
+  name: centralized-k8s-ai
   namespace: mcp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k8s-ai-query
+      app: centralized-k8s-ai
   template:
     metadata:
       labels:
-        app: k8s-ai-query
+        app: centralized-k8s-ai
     spec:
       containers:
-      - name: k8s-ai-query
-        image: python:3.10-slim
-        command:
-          - /bin/sh
-          - -c
+      - name: centralized-k8s-ai
+        image: python:3.10
+        command: ["sh", "-c"]
+        args:
           - |
-            apt update && apt install -y git && \
-            git clone https://github.com/sanketarali/centralized-k8s-ai.git /app && \
-            cd /app/app && \
-            pip install --no-cache-dir -r requirements.txt && \
+            apt update && apt install -y git &&
+            git clone https://github.com/Sanketarali/centralized-k8s-ai.git /app &&
+            cd /app/app &&
+            python3 -m venv venv &&
+            . venv/bin/activate &&
+            pip install --upgrade pip &&
+            pip install -r requirements.txt &&
             uvicorn main:app --host 0.0.0.0 --port 8000
-        env:
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: openai-secret
-              key: api_key
         ports:
         - containerPort: 8000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: k8s-ai-query-service
-  namespace: mcp
-spec:
-  selector:
-    app: k8s-ai-query
-  ports:
-  - protocol: TCP
-    port: 8000
-    targetPort: 8000
-  type: NodePort
+        env:
+        - name: OPENAI_API_KEY
+          value: "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"
+        - name: GRAFANA_URL
+          value: "http://observ-stg.cloud-ng.net"
+        - name: GRAFANA_API_KEY
+          value: "glsa_m8OJruchFfnZQk5qEu0Twlh5GXKkrSxn_d3699897"
